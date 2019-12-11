@@ -1,0 +1,61 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index cc376e2..472285a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,6 +1,9 @@
+ CMAKE_MINIMUM_REQUIRED (VERSION 3.8.2)
+ PROJECT (mqtt_cpp)
+ 
++include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
++conan_basic_setup(TARGETS)
++
+ SET(CMAKE_CXX_STANDARD 14)
+ SET(CMAKE_CXX_STANDARD_REQUIRED ON)
+ # Don't use GNU extensions
+diff --git a/include/CMakeLists.txt b/include/CMakeLists.txt
+index 4ad4b58..0cf2edc 100644
+--- a/include/CMakeLists.txt
++++ b/include/CMakeLists.txt
+@@ -6,17 +6,17 @@ SET(ROOT_MQTT_TARGET include/mqtt)
+ 
+ ADD_LIBRARY(mqtt_cpp_iface INTERFACE)
+ 
+-TARGET_LINK_LIBRARIES(mqtt_cpp_iface INTERFACE Threads::Threads Boost::system Boost::date_time)
++TARGET_LINK_LIBRARIES(mqtt_cpp_iface INTERFACE Threads::Threads CONAN_PKG::boost_system CONAN_PKG::boost_date_time)
+ 
+ IF(MQTT_USE_STATIC_OPENSSL)
+     # Unfortunately, cmake doesn't automatically detect that statically linked openssl
+     # requires at least two more libs to be linked. "dl" is for dynamic library linking
+     # and zlib is for basic compression functionality.
+     # There is currently no way to specify statically linked zlib.
+-    TARGET_LINK_LIBRARIES(mqtt_cpp_iface INTERFACE $<$<BOOL:${MQTT_USE_TLS}>:${CMAKE_DL_LIBS} ZLIB::ZLIB>)
++    TARGET_LINK_LIBRARIES(mqtt_cpp_iface INTERFACE $<$<BOOL:${MQTT_USE_TLS}>:${CMAKE_DL_LIBS} CONAN_PKG::zlib>)
+ ENDIF()
+ 
+-TARGET_LINK_LIBRARIES(mqtt_cpp_iface INTERFACE $<$<BOOL:${MQTT_USE_TLS}>:OpenSSL::SSL>)
++TARGET_LINK_LIBRARIES(mqtt_cpp_iface INTERFACE $<$<BOOL:${MQTT_USE_TLS}>:CONAN_PKG::OpenSSL>)
+ 
+ TARGET_INCLUDE_DIRECTORIES(mqtt_cpp_iface
+   INTERFACE
+diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
+index 4b9eac2..a0c0040 100644
+--- a/test/CMakeLists.txt
++++ b/test/CMakeLists.txt
+@@ -78,8 +78,6 @@ IF (MQTT_TEST_7)
+     )
+ ENDIF ()
+ 
+-FIND_PACKAGE (Boost 1.66.0 REQUIRED COMPONENTS unit_test_framework)
+-
+ # Without this setting added, azure pipelines completely fails to find the boost libraries. No idea why.
+ IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+     LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
+@@ -89,7 +87,7 @@ FOREACH (source_file ${check_PROGRAMS})
+     GET_FILENAME_COMPONENT (source_file_we ${source_file} NAME_WE)
+     ADD_EXECUTABLE (${source_file_we} ${source_file})
+     TARGET_COMPILE_DEFINITIONS (${source_file_we} PUBLIC $<IF:$<BOOL:${MQTT_USE_STATIC_BOOST}>,,BOOST_TEST_DYN_LINK>)
+-    TARGET_LINK_LIBRARIES (${source_file_we} mqtt_cpp_iface Boost::unit_test_framework)
++    TARGET_LINK_LIBRARIES (${source_file_we} mqtt_cpp_iface CONAN_PKG::boost_test)
+ 
+     IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+         IF (MQTT_CODECOV)

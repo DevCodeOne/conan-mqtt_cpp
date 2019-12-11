@@ -1,0 +1,5 @@
+*
+
+!conanfile.py
+!CMakeLists.patches
+!.gitignore
