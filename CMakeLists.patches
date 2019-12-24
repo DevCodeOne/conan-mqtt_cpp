@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index cc376e2..472285a 100644
+index cc376e2..4476440 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -1,6 +1,9 @@
@@ -12,6 +12,19 @@ index cc376e2..472285a 100644
  SET(CMAKE_CXX_STANDARD 14)
  SET(CMAKE_CXX_STANDARD_REQUIRED ON)
  # Don't use GNU extensions
+@@ -112,12 +115,8 @@ ENDIF ()
+ SET (Boost_USE_MULTITHREADED ON)
+ FIND_PACKAGE (Threads REQUIRED)
+ 
+-FIND_PACKAGE (Boost 1.66.0 REQUIRED COMPONENTS system date_time)
+-
+ IF (MQTT_USE_TLS)
+-    FIND_PACKAGE (OpenSSL REQUIRED)
+     IF (MQTT_USE_STATIC_OPENSSL)
+-        FIND_PACKAGE (ZLIB REQUIRED)
+     ENDIF ()
+ ENDIF ()
+ 
 diff --git a/include/CMakeLists.txt b/include/CMakeLists.txt
 index 4ad4b58..0cf2edc 100644
 --- a/include/CMakeLists.txt

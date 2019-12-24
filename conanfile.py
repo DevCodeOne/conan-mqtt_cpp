@@ -18,8 +18,10 @@ class MqttCppConan(ConanFile):
             "use_std_variant" : True, "use_std_optional" : True, "use_std_string_view" : True, "use_std_any" : True, \
             "use_std_shared_ptr_array" : True, "build_tests" : False, "build_examples" : False, "always_send_reason_code" : True}
     generators = "cmake"
-    requires = "boost_asio/1.66.0@bincrafters/stable"
-    exports_sources = "conanfile.py", "CMakeLists.patches"
+    requires = "boost_asio/1.66.0@bincrafters/stable", \
+            "boost_multi_index/1.66.0@bincrafters/stable", \
+            "boost_type_erasure/1.66.0@bincrafters/stable"
+    exports_sources = "conanfile.py", "CMakeLists.patches", "Source.patches"
 
     no_copy_source = True
     build_policy = "always"
@@ -56,6 +58,7 @@ class MqttCppConan(ConanFile):
             self.run("git checkout 43bd1099713aa539d13e61eb078ba1817b2443aa")
 
         tools.patch(base_path="sources", patch_file="CMakeLists.patches")
+        tools.patch(base_path="sources", patch_file="Source.patches")
 
     def build(self):
         cmake = self._configure_cmake()
